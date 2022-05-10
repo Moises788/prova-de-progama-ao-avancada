@@ -9,15 +9,31 @@ unsigned char decToByte( unsigned char codeBit){
   for(cont=7; cont>=0; cont--){
 
     if((codeBit & bit) > 0){
-      printf("1");
+      printf("1 ");
     }
     else{
-      printf("0");
+      printf("0 ");
     }
     bit = bit>>1;
   }
   
   return numero;
+}
+
+unsigned long long compMat(unsigned char *pc, unsigned char matriz[8][8]){
+  int aux;
+  unsigned long long bigByte;
+  pc = &bigByte;
+  for (int i = 0; i < 8; i++){
+    aux =7;
+    pc[i] = 0;
+    
+    for(int j = 0; j < 8; j++) {        
+      pc[i] += matriz[i][j]<<aux;
+      aux--;  
+    }   
+  } 
+  return bigByte;
 }
 
 void imprimematriz(unsigned char matriz[8][8] , int linhas, int colunas){
@@ -27,16 +43,26 @@ void imprimematriz(unsigned char matriz[8][8] , int linhas, int colunas){
 		for(j = 0; j < colunas; j++){
 			printf("%d ", matriz[i][j]);
 		}
-		printf("\n\n");
+		printf("\n");
 	}
 }
 
+void send(unsigned long long bigByte ){
+  unsigned char *pAux;
+  pAux = &bigByte;
+  for(int i=0; i<=7; i++){
+    decToByte(pAux[i]);
+    printf("\n");
+  }
+
+}
 
 int main(){
-    unsigned char *pc, matriz[8][8];
-    unsigned long long decodeBit;
-    int i, j;
-    int aux = 7;
+  unsigned char *pc, matriz[8][8];
+  unsigned long long decodeBit;
+  int i, j;
+  int aux = 7;
+  
   for(i = 0; i < 8; i++) {
 		for(j = 0; j < 8; j++) {
 			if ((j%2) == 0){
@@ -49,29 +75,16 @@ int main(){
         } 
 		}
 	}
-    pc = &decodeBit;
-   matriz[0][1] = 0;
-   matriz[0][0] = 0;
-    imprimematriz(matriz,8,8);
+  
+  matriz[0][1] = 0;
+  matriz[0][0] = 0;
 
-    for ( i = 0; i < 8; i++){
-      aux =7;
-      pc[i] = 0;
-      
-      for( j = 0; j < 8; j++) {        
-        pc[i] += matriz[i][j]<<aux;
-        aux--;  
-	    }
-      printf("%d \n", pc[i]); 
-       
-    }
+  imprimematriz(matriz,8,8);
 
-    printf("%llu \n", decodeBit);
+  decodeBit = compMat(pc, matriz);
 
-     for(i=0; i<=7; i++){
-    decToByte(pc[i]);
-    printf("|");
-  }
-   
-    return 0;
+  printf("\nMatriz compactada: %llu \n\n", decodeBit);
+
+  send(decodeBit);
+  return 0;
 }
